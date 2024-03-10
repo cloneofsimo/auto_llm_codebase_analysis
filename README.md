@@ -1,6 +1,10 @@
-# Automate Codebase Analysis
+# Automate Massive Codebase Analysis with Language Model
 
-Ever had to go over all the codebase and analyze everything one-by-one? Ever wanted to "read over all of it really fast" and get "high level picture" per folder? This tool does exactly that, hope to make your codebase-analysis time shorter.
+<p align="center">
+  <img src="image.png">
+</p>
+
+Ever had to go over all the codebase and analyze everything one-by-one? Ever wanted to "read over all of it really fast" and get "high level picture" per folder? This short tiny codebase does exactly that, hope to make your codebase-analysis time shorter.
 
 This will recursively generate...
 
@@ -33,75 +37,126 @@ The following is example output from analysis of DeepSpeed codebase:
 ---
 
 
+
+
 ### Summary
 
-* `__init__.py`: This file is the main file that is imported when someone imports the `op Rating (out of 5):3
+* `is_torch_ver_eq_2_0 and is_tor`: These functions are used to check the version of PyTorch being used. They Rating (out of 5):1
 
-* `AsyncIOBuilder`: It's a class that builds asynchronous I/O operations. The importance Rating (out of 5):3
+* `torch_ver_ge_1_13`: Checks if the version of PyTorch is greater than or equal to  Rating (out of 5):2
 
-* `Major classes/methods`: AsyncIOBuilder is the main class used for building asynchronous I/O Rating (out of 5):3
+* `has_coalescing_manager`: This method checks if the coalescing manager is available. It's R Rating (out of 5):1
 
-* `Summary:`: This is the main package that provides classes and methods for building asynchronous I/ Rating (out of 5):3
+* `has_all_reduce_coalesced`: This method checks if the all_reduce_coalesced function is available Rating (out of 5):1
 
-* `AsyncIOBuilder:`: It is a class that provides methods for building asynchronous I/O operations. Rating (out of 5):3
+* `get_coalescing_manager`: This method is used to get the coalescing manager  Rating (out of 5):2
 
-* `Methods in AsyncIOBuilder:` These methods are used for building different types of asynchronous I/O operations. Rating (out of 5):5
+* `all_gather_comm_off, reduce_scatter_comm_off, broadcast_comm_off, all_reduce_comm_off and reduce_comm_off`: The methods are used to turn off certain communication functions. They Rating (out of 5):1 
 
-* `Important methods include:` - `__init__`: Initializes the AsyncIOBuilder object. It's Rating (out of 5):2
+* `backward_comm_off`: This method turns off communication for both all_gather and reduce_scatter methods. It's Rating (out of 5):2
 
-- `build_read_from_file`: Builds an asynchronous reader from a file. Rating (out of 5):2
+* `Noop`: This is a class used to represent a no-operation. It's Rating (out of 5):1
 
-- `build_write_to_file`: Builds an asynchronous writer to a file. Rating (out of 5):2
+* `TorchBackend`: This class is a light-weight wrapper around the torch.distributed API. It's Rating (out of 5):3
 
-- `build_concurrent_reads`: Builds multiple concurrent asynchronous read operations. Rating (out of 5):5
+* Methods with names starting with `get_`, `has_`, `init_process_group`, `all_reduce`, `reduce` , `reduce_scatter`, `broadcast`, `all_gather` and `is_` -- all these methods are key methods in the file and are all Rating (out of 5):4
 
-Overall, this codebase provides a set of tools for building asynchronous I/O operations in Python. It's a part of a larger project, likely a data-parallel computing library, that is built on top of the asyncio Python library.
+This file is mostly a wrapper for the torch.distributed API. It exposes a subset of these functions, and allows for easy control over what kind of communication is being done. It also has a "Noop" class that represents no-operation, which is useful for making certain parts of the code optional based on the control flags.
+
+The file also defines several utility functions and a main class, `TorchBackend`, that wraps around the torch.distributed API, making it easier to use and more flexible.
 
 ### Highlights
 
-1. **Import of AsyncIOBuilder:** This line `from ..op_builder import AsyncIOBuilder` imports the AsyncIOBuilder class from the `op_builder` module in the parent directory. This is usually used when you want to support asynchronous operations in your Python code.
-2. **Class Definition:** The file doesn't contain any classes or class-like definitions. It could be a stand-alone module rather than part of a larger application, if you are familiar with Python's package structure.
-3. **Module-Level Function or Variable Definitions:** Asynchronous operations in Python typically involve the use of coroutines, which are essentially asynchronous versions of ordinary functions or methods. The file appears to use the Python async IO capabilities to manage such operations.
-4. **File Structure:** The file's structure makes it look like it might be a part of a larger project or solution, where other Python files also import and use AsyncIOBuilder.
-5. **Identifiers:** Although, it seems as though this file could be a 'draft' or 'staging'/'development' version of a larger module or package - there are leading underscores in the file name `__init__.py`, potentially indicating that it's intended to be an 'init' file for a package, marking it as a Python package directory.
+1. __Object-Oriented Programming__: The code is written in a Python script with a clear object-oriented structure where TorchBackend subclasses the Backend class. This provides a clear hierarchy and makes the code more organized and maintainable.
+2. __Torch Distributed API Wrapper__: The code is a wrapper for several functions provided by the PyTorch Distributed API. It takes care of different versions of PyTorch and attempts to offer a consistent interface. The developer created classes like 'Noop' to handle communication-related operations when certain flags are off.
+3. __Global Variables__: There are global variables that control the status of communication, such as `DS_COMM_ALL_GATHER_OFF`, `DS_COMM_REDUCE_SCATTER_OFF`, etc. These variables can be used to turn communication related functions off, effectively freezing the communication.
+4. __Decorators and Globals__: Decorators and global variables are used to restrict the functionality of some aspects of the DeepSpeed library.
+5. __Methods and Usage__: This script includes several methods for collecting tensors, reducing tensors, broadcasting, and gathering tensors. These methods are implemented and can be called directly. This interacts with the PyTorch distribution library to take advantage of distributed data parallelism.
 
 ### Pythonic Pseudocode
 
 ```python
-# File: ops/aio/__init__.py
+// Importing necessary libraries
+import torch
+from deepspeed import utils
+from .utils import *
+from .backend import *
+from ..runtime import compiler
+import os
 
-# Description: 
-# This Python module initializes the AsyncIOBuilder class from the op_builder module. 
-# The AsyncIOBuilder class is a part of the DeepSpeed library that facilitates the creation of asynchronous operations. 
-# The purpose of this file is to provide a consistent interface for asynchronous operations across various devices and systems.
+// Global variables to turn communication operations off
+DS_COMM_ALL_GATHER_OFF = False
+DS_COMM_REDUCE_SCATTER_OFF = False
+DS_COMM_BROADCAST_OFF = FALSE
+DS_COMM_ALL_REDUCE_OFF = FALSE
+DS_COMM_REDUCE_OFF = FALSE
 
-# Imports: 
-# Import the AsyncIOBuilder class from the op_builder module
-from ..op_builder import AsyncIOBuilder
+// Torch version that are equivalent to 2.0 and greater 
+Function is_torch_ver_eq_2_0()
+Function is_torch_ver_ge_2_1()
+Function torch_ver_ge_1_13()
 
-# AsyncIOBuilder Class:
-# This class is initialized with the following method:
+// Check if the function ,get_all_gather_function or get_reduce_scatter_function are available.
+Function has_coalescing_manager()
+Function has_all_reduce_coalesced()
 
-class AsyncIOBuilder:
-    def __init__(self, *args, **kwargs):
-        # Constructor. Initialize the AsyncIOBuilder object with the provided arguments.
-        pass
+// Function to toggle communication operations on/off
+Function all_gather_comm_off(flag=False)
+Function reduce_scatter_comm_off(flag=False)
+Function broadcast_comm_off(flag=False)
+Function all_reduce_comm_off(flag=False)
+Function reduce_comm_off(flag=False)
+Function backward_comm_off(flag=False)
 
-    def method1(*args, **kwargs):
-        # Method 1.
-        # This method is responsible for ... (explanation of the method)
-        pass
-
-    def method2(*args, **kwargs):
-        # Method 2.
-        # This method is responsible for ... (explanation of the method)
-        pass
-
-    # Continue with other methods...
+// This class provides a light-weight wrapper for torch.distributed API
+Class TorchBackend extends Backend{
+    // Constructor
+    function __init__(backend, timeout, init_method, rank=-1, world_size=-1, name='torch')
+    function get_all_gather_function()
+    function get_reduce_scatter_function()
+    function has_all_gather_into_tensor()
+    function has_reduce_scatter_tensor()
+    function init_process_group(backend, timeout, init_method, rank, world_size)
+    function all_reduce(tensor, op=ReduceOp.SUM, group=None, async_op=False)
+    function inference_all_reduce(tensor, op=ReduceOp.SUM, group=None, async_op=False)
+    function all_reduce_coalesced(tensors, op=ReduceOp.SUM, group=None, async_op=False)
+    function reduce(tensor, dst, op=ReduceOp.SUM, group=None, async_op=False)
+    function reduce_scatter(output, input_list, op=ReduceOp.SUM, group=None, async_op=False)
+    function broadcast(tensor, src, group=None, async_op=False)
+    function all_gather(tensor_list, tensor, group=None, async_op=False)
+    function all_gather_into_tensor(output_tensor, input_tensor, group=None, async_op=False)
+    function all_gather_base(output_tensor, input_tensor, group=None, async_op=False)
+    function all_gather_coalesced(output_tensors, input_tensors, group=None, async_op=False)
+    function reduce_scatter_tensor(output_tensor, input_tensor, op=ReduceOp.SUM, group=None, async_op=False)
+    function all_to_all_single(output, input, output_split_sizes=None, input_split_sizes=None, group=None, async_op=False)
+    function all_to_all(output_tensor_list, input_tensor_list, group=None, async_op=False)
+    function send(tensor, dst, group=None, tag=0)
+    function recv(tensor, src=None, group=None, tag=0)
+    function isend(tensor, dst, group=None, tag=0)
+    function irecv(tensor, src=None, group=None, tag=0)
+    function gather(tensor, gather_list=None, dst=0, group=None, async_op=False)
+    function scatter(tensor, scatter_list=None, src=0, group=None, async_op=False)
+    function barrier(group=torch.distributed.GroupMember.WORLD, async_op=False, device_ids=None)
+    function monitored_barrier(group=torch.distributed.GroupMember.WORLD, timeout=None, wait_all_ranks=False)
+    function get_rank(group=None)
+    function get_world_size(group=None)
+    function is_initialized()
+    function get_backend(group=None)
+    function new_group(ranks)
+    function get_global_rank(group, group_rank)
+    function get_world_group()
+    function destroy_process_group(group=None)
+    function _reduce_op(op)
+}
 ```
 
 
 ### import Relationships
 
 Imports found:
-from ..op_builder import AsyncIOBuilder
+from deepspeed import utils
+from .utils import *
+from .backend import *
+from .comm import *
+from ..runtime import compiler
+import os
