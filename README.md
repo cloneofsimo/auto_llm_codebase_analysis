@@ -1,7 +1,7 @@
 # Automate Massive Codebase Analysis with Language Model
 
 <p align="center">
-  <img src="image.png">
+  <img src="chimp.webp">
 </p>
 
 Ever had to go over all the codebase and analyze everything one-by-one? Ever wanted to "read over all of it really fast" and get "high level picture" per folder? This short tiny codebase does exactly that, hope to make your codebase-analysis time shorter.
