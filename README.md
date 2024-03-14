@@ -19,7 +19,7 @@ Install sglang and run server.
 
 ```bash
 pip install sglang
-python -m sglang.launch_server --model-path deepseek-ai/deepseek-coder-6.7b-instruct --tp 4 --port 8080
+python -m sglang.launch_server --model-path "Qwen/Qwen1.5-72B-Chat" --tp 4 --port 8080
 ```
 
 
