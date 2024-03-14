@@ -32,5 +32,5 @@ convert.py CODEBASE_DIR OUTPUT_DIR --port 8080
 
 # Example Output:
 
-The [following](EXAMPLE_GEN.md) is example output from analysis of DeepSpeed codebase.
+The [following](https://github.com/cloneofsimo/reverse_eng_deepspeed_study/tree/main/decomposed) is example output from analysis of DeepSpeed codebase.
 
